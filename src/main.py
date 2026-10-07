@@ -3,6 +3,7 @@ import sys  #helps us to quit the application
 
 from const import * #gives us access to const.py constants 
 from game import Game
+from square import Square
 
 class Main: 
 
@@ -61,19 +62,47 @@ class Main:
 
                #click release
                elif event.type == pygame.MOUSEBUTTONUP: 
-                    dragger.update_mouse(event.pos)
-                    released_row = dragger.mouseY // SQSIZE
-                    released_col = dragger.mouseX // SQSIZE
-                    square = board.squares[released_row][released_col]
+                    if dragger.dragging:
+                        dragger.update_mouse(event.pos)
+                        released_row = dragger.mouseY // SQSIZE
+                        released_col = dragger.mouseX // SQSIZE
+                        square = board.squares[released_row][released_col]
                     
-                    if square.has_piece(): 
-                        if dragger.piece != None: 
-                            if square.piece.color != dragger.piece.color and square in piece.moves:
-                                pass
-                    elif (released_row, released_col) in [(move.final.row, move.final.col) for move in dragger.piece.moves]:
-                        square.piece = dragger.piece
-                        board.squares[dragger.initial_row][dragger.initial_col].piece = None 
-                        dragger.undrag_piece()
+                        if square.has_piece(): 
+                            #Explosive capture of opponent pieces 
+                            if square.piece.color != dragger.piece.color and (released_row, released_col) in [(move.final.row, move.final.col) for move in dragger.piece.moves]:
+                                #Surrounding square locations that could be targets of the atomic explosion
+                                potential_surrounding_targets = [ 
+                                    (square.row +1, square.col), #down
+                                    (square.row -1, square.col), #up
+                                    (square.row, square.col -1), #left
+                                    (square.row, square.col +1), #right
+                                    (square.row +1, square.col+1), #down-right
+                                    (square.row +1, square.col-1), #down-left
+                                    (square.row -1, square.col-1), #up-left
+                                    (square.row -1, square.col+1), #up-right
+                                ]
+        
+                                potential_surrounding_targets = [t for t in potential_surrounding_targets if Square.in_range(*t)] #filters out spaces out-of-range 
+                                potential_surrounding_targets = [board.squares[row][col] for (row, col) in potential_surrounding_targets]
+                               
+                                for target in potential_surrounding_targets: 
+                                    if target.has_enemy_piece(dragger.piece.color) and not (target.piece.name == "pawn"):
+                                        target.piece = None 
+                                square.piece = None
+                                board.squares[dragger.initial_row][dragger.initial_col].piece = None 
+                                dragger.undrag_piece()
+                            #if released over own team piece
+                            elif square.piece.color == dragger.piece.color: 
+                                dragger.undrag_piece()
+                        #valid move?
+                        elif (released_row, released_col) in [(move.final.row, move.final.col) for move in dragger.piece.moves]:
+                            square.piece = dragger.piece
+                            board.squares[dragger.initial_row][dragger.initial_col].piece = None 
+                            dragger.undrag_piece()
+                        else: 
+                            dragger.undrag_piece()
+
 
                     #show methods
                     #game.show_bg(screen)
