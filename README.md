@@ -2,8 +2,6 @@
 
 A two-player desktop game of atomic chess, built with Python and Pygame. Atomic chess is a chess variant where every capture triggers an explosion.
 
-![Atomic Chess Screenshot](image.png)
-
 ## Features
 - Drag-and-drop piece movement with highlighted legal moves and last move
 - Atomic explosions: a capture removes the capturing piece, the captured piece, and every adjacent non-pawn enemy piece
@@ -39,4 +37,4 @@ Run it from the root folder, because the game loads its images and sounds with r
 - Not yet implemented: castling, en passant, pawn promotion, and an AI opponent.
 
 ## Credits
-Built on the structure of a Pygame chess tutorial [https://youtu.be/OpL0Gcfn4B4?t=11970]. The atomic rules, check detection, and win conditions were added on top.
+Built on the structure of a Pygame chess tutorial: https://youtu.be/OpL0Gcfn4B4?t=11970. The atomic rules, check detection, and win conditions were added on top.
